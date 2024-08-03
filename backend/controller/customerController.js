@@ -8,7 +8,7 @@ export const createCustomer = async (req, res, next) => {
 };
 export const getCustomers = async (req, res, next) => {
   const customers = await Customer.find();
-  console.log(customers);
+  // console.log(customers);
   res.status(200).json({
     customers,
   });

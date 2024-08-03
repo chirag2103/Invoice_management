@@ -2,10 +2,12 @@ import Invoice from '../models/Invoice.js';
 import catchAsyncError from '../middlewares/catchAsyncError.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import Customer from '../models/Customer.js';
+import mongoose from 'mongoose';
 
 export const getLastInvoice = catchAsyncError(async (req, res, next) => {
   try {
     const invoice = await Invoice.findOne().sort({ _id: -1 });
+    console.log(invoice);
     res.status(200).json({
       invoice,
     });
@@ -47,21 +49,71 @@ export const getSingleInvoice = catchAsyncError(async (req, res, next) => {
     next(new ErrorHandler('Error fetching invoice', 500));
   }
 });
+// export const getInvoicesByCustomer = catchAsyncError(async (req, res, next) => {
+//   try {
+//     const customerId = req.params.id;
+//     console.log(customerId);
+
+//     // Validate if customerId is a valid ObjectId before querying the database
+//     if (!mongoose.Types.ObjectId.isValid(customerId)) {
+//       return next(new ErrorHandler('Invalid customer ID', 400));
+//     }
+
+//     const invoices = await Invoice.find({ customer: customerId });
+//     // const invoices = await Invoice.find({ customer: customerId }).populate(
+//     //   'customer',
+//     //   'name'
+//     // );
+//     const customer = await Customer.findById(customerId);
+//     const customerName = customer.name;
+//     console.log(customerName);
+//     let total = 0;
+//     invoices.map((invoice) => {
+//       total += invoice.grandTotal;
+//     });
+//     console.log(total);
+
+//     res.status(200).json({
+//       invoices,
+//       total,
+//       customerName,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     next(new ErrorHandler('Error fetching invoices for the customer', 500));
+//   }
+// });
+
 export const getInvoicesByCustomer = catchAsyncError(async (req, res, next) => {
   try {
-    const customerId = req.params.customerId;
+    const customerId = req.params.id;
 
     // Validate if customerId is a valid ObjectId before querying the database
     if (!mongoose.Types.ObjectId.isValid(customerId)) {
       return next(new ErrorHandler('Invalid customer ID', 400));
     }
 
+    // const invoices = await Invoice.find().populate('customer');
+
     const invoices = await Invoice.find({ customer: customerId });
+    // const invoices = await Invoice.find().populate('customer');
+
+    const customer = await Customer.findById(customerId);
+    const customerName = customer.name;
+
+    let total = 0;
+    invoices.map((invoice) => {
+      console.log(invoice.invoiceProducts);
+      total += invoice.grandTotal;
+    });
 
     res.status(200).json({
       invoices,
+      total,
+      customerName,
     });
   } catch (error) {
+    console.log(error);
     next(new ErrorHandler('Error fetching invoices for the customer', 500));
   }
 });
@@ -84,6 +136,19 @@ export const updateInvoice = catchAsyncError(async (req, res, next) => {
       invoice,
     });
   } catch (error) {
+    console.log(error);
     next(new ErrorHandler('Error updating invoice', 500));
   }
+});
+
+export const deleteInvoice = catchAsyncError(async (req, res, next) => {
+  let product = await Invoice.findById(req.params.id);
+  if (!product) {
+    return next(new ErrorHandler('Product not found', 404));
+  }
+  await product.remove();
+  res.status(200).json({
+    success: true,
+    message: 'Invoice Deleted',
+  });
 });

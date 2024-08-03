@@ -1,11 +1,33 @@
 import React, { useRef } from 'react';
 import './Print.css';
 import { useLocation } from 'react-router-dom';
+import { ToWords } from 'to-words';
 
 const Print = () => {
+  const toWords = new ToWords({
+    localeCode: 'en-IN',
+    converterOptions: {
+      currency: true,
+      ignoreDecimal: false,
+      ignoreZeroCurrency: false,
+      doNotAddOnly: false,
+      currencyOptions: {
+        // can be used to override defaults for the selected locale
+        name: 'Rupee',
+        plural: 'Rupees',
+        symbol: '₹',
+        fractionalUnit: {
+          name: 'Paisa',
+          plural: 'Paise',
+          symbol: '',
+        },
+      },
+    },
+  });
   const location = useLocation();
   const {
     challanNo,
+    gst,
     invoicefor,
     billNo,
     products,
@@ -13,7 +35,6 @@ const Print = () => {
     date,
     grandTotal,
     totalAmount,
-    billDate,
     challanDate,
   } = location.state;
   console.log(date);
@@ -22,36 +43,37 @@ const Print = () => {
   return (
     <div ref={pdfRef}>
       <div className='Print'>
-        <h2>TAX INVOICE</h2>
+        <h2 className='bold'>TAX INVOICE</h2>
         <h3>{invoicefor}</h3>
         <div className='print-header'>
           <table className='table-1'>
             <tr>
-              <td rowSpan={2} style={{ width: '70%' }}>
-                <b>HARI OM ENGINEERING WORKS</b>
-                <p>PLOT NO. I-95, G.I.D.C ESTATE, V.U NAGAR</p>
+              <td rowSpan={2} style={{ width: '60%' }}>
+                <b style={{ fontSize: '22px', fontWeight: '800' }}>
+                  HARI OM ENGINEERING WORKS
+                </b>
+                <p>PLOT NO. I-77, G.I.D.C ESTATE, V.U NAGAR</p>
                 <p>ANAND-388121, GUJARAT,INDIA</p>
                 <p>
                   <b>GSTIN:</b>24AMFPP7083F1ZX
                 </p>
-                {/* <p>
-                  <b>MSME:</b>24AMFPP7083F1ZX
-                </p> */}
                 <p>
-                  <b>PAN:</b>AMFPP7083F
+                  <b>MSME:</b>UDYAM-GJ-03-0019325
                 </p>
-                <p>Mobile No. 9714275013</p>
-                <p>Email ID: parmarmahendrabhai63@gmail.com</p>
+
+                <p>
+                  <b>Mobile No.</b> 9714275013
+                </p>
               </td>
-              <td style={{ width: '15%' }}>
+              <td style={{ width: '20%' }}>
                 <p>Invoice No.</p>
-                <b>{billNo}</b>
+                <b>HEW{billNo}</b>
               </td>
-              <td style={{ width: '70%' }}>
+              <td style={{ width: '20%' }}>
                 <p>
                   <b>Date:</b>
                 </p>
-                <b>{billDate}</b>
+                <b>{date}</b>
                 {/* <b>{date.toLocaleDateString()}</b> */}
               </td>
             </tr>
@@ -68,44 +90,42 @@ const Print = () => {
           </table>
           <table className='table-2'>
             <tr>
-              <td rowSpan={3} style={{ width: '70%' }}>
+              <td rowSpan={3} style={{ width: '60%' }}>
                 <p>
                   <b>To,</b>
                 </p>
-                <b>{customer.name}</b>
+                <b style={{ fontSize: '20px', fontWeight: '600' }}>
+                  {customer.name}
+                </b>
                 <p>{customer.address}</p>
                 <p>
                   <b>GSTIN:</b>
                   {customer.gstNo}
                 </p>
               </td>
-              <td style={{ width: '15%' }}>
+              <td style={{ width: '20%' }}>
                 <p>Buyer's Order No.</p>
                 <b></b>
               </td>
-              <td style={{ width: '15%' }}>
+              <td style={{ width: '20%' }}>
                 <p>Dated</p>
                 <b></b>
               </td>
             </tr>
             <tr>
               <td>
-                <p>Dispatch Document No.</p>
-                <b>-</b>
+                <p>Dis. Doc. No-</p>
               </td>
               <td>
-                <p>Delivery Note Date</p>
-                <b>-</b>
+                <p>Delivery Date -</p>
               </td>
             </tr>
             <tr>
               <td>
-                <p>Dispatched Through</p>
-                <b>-</b>
+                <p>Dispatched Through -</p>
               </td>
               <td>
-                <p>Destination</p>
-                <b>-</b>
+                <p>Destination -</p>
               </td>
             </tr>
           </table>
@@ -114,8 +134,8 @@ const Print = () => {
         <table className='table-3'>
           <thead>
             <tr>
-              <th style={{ width: '10%' }}>Sr.No</th>
-              <th style={{ width: '50%' }}>Particulars</th>
+              <th style={{ width: '5%' }}>Sr.No</th>
+              <th style={{ width: '55%' }}>Particulars</th>
               <th style={{ width: '10%' }}>Quantity</th>
               <th style={{ width: '10%' }}>UOM</th>
               <th style={{ width: '10%' }}>Rate</th>
@@ -125,47 +145,47 @@ const Print = () => {
           <tbody>
             {products.map((product, index) => (
               <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{product.productName}</td>
-                <td>{product.quantity}</td>
-                <td>{product.uom}</td>
-                <td>{product.rate}</td>
-                <td>{product.quantity * product.rate}</td>
+                <td className='center'>{index + 1}</td>
+                <td style={{ fontWeight: 'bold' }}>{product.name}</td>
+                <td className='center'>{product.quantity}</td>
+                <td className='center'>{product.uom}</td>
+                <td className='center'>{product.rate}</td>
+                <td className='center'>{product.quantity * product.rate}</td>
               </tr>
             ))}
           </tbody>
         </table>
         <div className='calculation'>
-          <table className='table-3'>
+          <table className='table-3 center'>
             <tr>
-              <td rowSpan={6} style={{ width: '70%' }}>
+              <td rowSpan={4} style={{ width: '60%' }}>
                 Ruppes in Words :{' '}
-                <b>Rupees One Lakh Twenty Nine Thousand Eight Hundred Only</b>
+                <b>{toWords.convert(grandTotal, { currency: true })}</b>
               </td>
-              <td style={{ width: '15%' }}>
-                <b>Subtotal</b>
+              <td style={{ width: '20%' }}>
+                <b className='bold'>Subtotal</b>
               </td>
-              <td style={{ width: '15%' }}>
-                <b>{totalAmount}</b>
+              <td style={{ width: '20%' }}>
+                <b className='bold'>{totalAmount}</b>
               </td>
             </tr>
             <tr>
-              <td>CGST (9%)</td>
-              <td>{totalAmount * 0.09}</td>
+              <td>CGST ({gst}%)</td>
+              <td>{(totalAmount * (gst / 100)).toFixed(2)}</td>
             </tr>
             <tr>
-              <td>SGST (9%)</td>
-              <td>{totalAmount * 0.09}</td>
+              <td>SGST ({gst}%)</td>
+              <td>{(totalAmount * (gst / 100)).toFixed(2)}</td>
             </tr>
             <tr>
               <td>
-                <b>Grand Total</b>
+                <b className='bold'>Grand Total</b>
               </td>
               <td>
-                <b>{grandTotal}</b>
+                <b className='bold'>{grandTotal}</b>
               </td>
             </tr>
-            <tr>
+            {/* <tr>
               <td>Advance Paid</td>
               <td>33000</td>
             </tr>
@@ -176,12 +196,14 @@ const Print = () => {
               <td>
                 <b>96800</b>
               </td>
-            </tr>
+            </tr> */}
           </table>
         </div>
         <table className='table-3'>
           <tr>
-            <td>Bank Details</td>
+            <td>
+              <b>Bank Details</b>
+            </td>
             <td
               rowSpan={2}
               style={{ paddingTop: '100px', textAlign: 'center' }}

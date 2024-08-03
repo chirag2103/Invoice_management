@@ -12,7 +12,6 @@ const customerSchema = mongoose.Schema({
     type: String,
     default: 'V.U Nagar,Anand',
   },
-  // Add other properties as needed
 });
 
 export default mongoose.model('Customer', customerSchema);

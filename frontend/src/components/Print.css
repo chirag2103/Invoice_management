@@ -1,7 +1,7 @@
 .Print {
   font-family: Arial, sans-serif;
-  margin: 20px;
-  font-size: 12px;
+  margin: 0px 15px;
+  font-size: 16px;
   overflow-x: auto;
   white-space: normal;
 }
@@ -40,8 +40,16 @@
   border-collapse: collapse;
   border: 2px solid black;
 }
-.table-1 p {
+/* .table-1 p {
   line-height: 5px;
+} */
+.center {
+  text-align: center;
+  font-weight: bold;
+}
+.bold {
+  font-weight: 900;
+  font-size: 18px;
 }
 .table-1 td,
 .table-2 td {
